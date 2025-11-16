@@ -1,4 +1,4 @@
-# Digital SoC Design using OpenLANE 
+# Digital SoC Design using OpenLane 
 
 This repository documents steps in execusing a complete desgin flow for a digital SoC using **OpenLane** which is an open-source RTL-to-GDSII flow built around the SkyWater 130nm (Sky130) PDK.
 
@@ -79,9 +79,9 @@ Some key resources for documentation related to Sky130 PDK are listed in the fol
 >- *IHP Open Source PDK (SG13G2 – 130nm SiGe BiCMOS) – Open components for analog and RF SiGe processes.* https://github.com/IHP-GmbH/IHP-Open-PDK
 > 
 
-## Section 1: Initializing OpenLane and preparing design
+## Section 1: Initializing OpenLane & Synthesizing a Design
 
-To invoke OpenLane, navigate to ```openlane/``` directory and initialize *docker* from the current working directory.<br>
+To invoke OpenLane, navigate to ```openlane/``` directory and initialize **Docker** from the current working directory.<br>
 ```
 # Change directory to openlane flow directory
 cd Desktop/work/tools/openlane_working_dir/openlane/
@@ -94,13 +94,13 @@ cd Desktop/work/tools/openlane_working_dir/openlane/
 # Initialize docker in openlane directory
 docker
 ```
-The OpenLane flow can be invoked in Interactive mode by executing the following command:<br>
+The OpenLane flow can be invoked by executing the following command:<br>
 
 ```./flow.tcl -interactive``` <br>
 
-This command initializes the OpenLANE flow in Interactive mode, enabling command execution and interaction with the SoC design.
+This command initializes the OpenLane flow in *interactive* mode, enabling command execution and interaction with the design.
 
-Now that the Openlane flow is running interactively, we input the require package for its function: <br>
+Now that the OpenLane flow is running interactively, input the require package for its function: <br>
 
 ```
 # Package
@@ -114,10 +114,10 @@ Next, prepare the design for the flow. In this exercise, *picorv32a* is selected
 prep -design picorv32a
 ```
 
-> *Note that the provided OpenLane IP has 42 different designs which can be explored in  ```.../openlane_working_dir/openlane/designs``` directory.*<br>
-
 ![Image](https://github.com/user-attachments/assets/d130a938-2fc5-48a3-851f-7b257cddd49a)
+<br>
 
+> *Note: OpenLane has 42 different designs in  ```.../openlane_working_dir/openlane/designs``` directory which can be explored by users.*<br>
 
 At the *prep* stage, OpenLane performs several tasks to prepare the design for the subsequent stages of the flow. for example, it merges the LEF (Library Exchange Format) files (i.e., technology LEF `.tlef` and cell LEF `.lef`) into a single file, which contain the physical library data and is then used in the design flow.<br>
 Further, a new directory will be created in `.../openlane/designs/picorv32a/runs`with date-time of the prepration as name of the directory. This directory contains sub-directories for reports generated at each step along the flow.<br>
@@ -136,14 +136,15 @@ Now the design is ready for synthesis. Initilized it by executing the following 
 run_synthesis
 ```
 
-During synthesis, OpenLane uses *Yosys* and *ABC* to convert the RTL Verilog design into a *gate-level netlist* mapped to Sky130 standard cells. The flow optimizes logic, removes redundancies, performs timing checks with OpenSTA, and generates reports that guide the next stages of the flow. These reports can be accessed in `../reports/synthesis` directory. <br>
-For example, parameters like *Flop Ratio* and *DFF%* can be calcuated from statistics report `1-yosys_dff.stat` as shown in the following screenshot.
+During synthesis, OpenLane uses **Yosys** and **ABC** to convert the RTL Verilog design into a *gate-level netlist* mapped to Sky130 standard cells. The flow optimizes logic, removes redundancies, performs timing checks with OpenSTA, and generates reports that guide the next stages of the flow. These reports can be accessed in `../reports/synthesis` directory. <br>
+<br>
+For example, parameters like **Flop Ratio** and **DFF%** can be calcuated from statistics report `1-yosys_dff.stat` as shown in the following screenshot.
 
 ![Image](https://github.com/user-attachments/assets/f119a59a-68d7-422f-acb5-fb7393413970)
 
 
 
->In an ASIC synthesis, *Flop Ratio* and *DFF%* help to estimate how sequential-heavy a design is. They are derived from the synthesis statistics report, which lists the total number of standard cells and the number of flip-flops (DFFs) used in the netlist.
+>In an ASIC synthesis, *Flop Ratio* and <b>DFF%</b> help to estimate how sequential-heavy a design is. They are derived from the synthesis statistics report, which lists the total number of standard cells and the number of flip-flops (DFFs) used in the netlist.
 
 #### Flop Ratio
 Flop Ratio indicates how many flip-flops exist relative to the total number of cells.
@@ -156,7 +157,12 @@ As per the above synthesis report, the *Flop Ratio* is calculated to be **0.089*
 
 #### DFF%
 This expresses the flip-flop count as a percentage of the total cell count.
+<br>
+
 $$
 \text{DFF\%} = \frac{\text{Number of DFF cells}}{\text{Total number of cells}} \times 100
 $$
-As per the above synthesis report, the *DFF%* is calculated to be **8.9%** in *picorv32a* design.
+
+<br>
+As per the above synthesis report, the <b>DFF%</b> is calculated to be <b>8.9%</b> in the design.
+<br>
