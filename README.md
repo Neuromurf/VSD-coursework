@@ -1,11 +1,10 @@
-# VSD-coursework
-# Digital SoC Design using open-source EDA tools
+# Digital SoC Design using OpenLANE 
 
-This repository documents digital SoC design using OpenLane, an open-source RTL-to-GDSII flow built around the SkyWater 130nm (Sky130) PDK.
+This repository documents steps in execusing a complete desgin flow for a digital SoC using **OpenLane** which is an open-source RTL-to-GDSII flow built around the SkyWater 130nm (Sky130) PDK.
 
-## Section 1: Inspection of Open-Source EDA, OpenLane, and Sky130 PDK
+## Introduction to ASIC Design Flow and Open-Source EDA tools
 
-This section provides a quick overview of ASIC design pipeline and essential components involved in open-source ASIC chip design.
+This section provides a high-level overview of ASIC design pipeline, essential components involved in open-source ASIC chip design and open-source EDA tools specifically OpenLANE.
 
 ### High-level ASIC Design Flow 
 ASIC design pipeline is a sequential series of processes, tools, and steps involved in designing, verifying, and manufacturing an ASIC.
@@ -49,7 +48,7 @@ Following table lists some of the commonly used open-source EDA tools.
 | **11. SPICE-Level Simulation (optional)** | **ngspice**                            | Transistor-level circuit simulation                               | [http://ngspice.sourceforge.net/](http://ngspice.sourceforge.net/)                                   |
 | **Complete End-to-End Flow**              | **OpenLane**                           | Automates most steps above into one unified flow                  | [https://github.com/The-OpenROAD-Project/OpenLane](https://github.com/The-OpenROAD-Project/OpenLane) |
 
-> *Note that OpenROAD is a customisable digital place-and-route framework, while OpenLane is a user-friendly, automated RTL-to-GDSII flow built on top of OpenROAD, optimized for power, performance, and area (PPA) trade-offs.*
+> *Note: OpenROAD is a customisable digital place-and-route framework, while OpenLane is a user-friendly, automated RTL-to-GDSII flow built on top of OpenROAD, optimized for power, performance, and area (PPA) trade-offs.*
 
 ### OpenLane
 OpenLane is a streamlined, automated digital ASIC flow built on top of multiple open-source tools such as Yosys, OpenROAD, Magic, Netgen, KLayout, and others. It supports process such as RTL synthesis, Floorplanning, Placement & routing, Timing and DRC checks, and GDSII generation. 
@@ -64,8 +63,8 @@ https://github.com/librelane/librelane.git
 
 ### Sky130 PDK
 
-The SkyWater 130nm PDK provides all the design rules, device models, libraries, and data required to fabricate a chip at 130nm. As an open-source PDK, it enables anyone to design and test ASICs freely.
-Some key resources for more documentation are listed in the followiing table.
+The SkyWater 130nm PDK provides all the design rules, device models, libraries, and data required to fabricate a chip at 130nm node. As an open-source PDK, it enables anyone to design and test ASICs without any costs.
+Some key resources for documentation related to Sky130 PDK are listed in the followiing table.
 
 | **Resource**                           | **Link**                                                                                             | **Description**                                                                                       |
 | -------------------------------------- | ---------------------------------------------------------------------------------------------------- | ----------------------------------------------------------------------------------------------------- |
@@ -74,7 +73,90 @@ Some key resources for more documentation are listed in the followiing table.
 | **OpenPDKs (Sky130 Build System)**     | [https://github.com/RTimothyEdwards/open_pdks](https://github.com/RTimothyEdwards/open_pdks)         | Tools and scripts used to build and install the Sky130 PDK for Magic, KLayout, and OpenLane.          |
 | **OpenLane (Sky130 Flow Integration)** | [https://github.com/The-OpenROAD-Project/OpenLane](https://github.com/The-OpenROAD-Project/OpenLane) | Demonstrates how Sky130 is used within the OpenLane RTL-to-GDSII digital design flow.                 |
 
-There are a few other open-source PDKs available such as;
-- GF180MCU PDK (GlobalFoundries 180nm) – A fully open PDK offering analog, mixed-signal, and MCU-friendly features. https://gf180mcu-pdk.readthedocs.io
-- IHP Open Source PDK (SG13G2 – 130nm SiGe BiCMOS) – Open components for analog and RF SiGe processes. https://github.com/IHP-GmbH/IHP-Open-PDK
+>
+> *There are a few other open-source PDKs available publically such as;*
+>- *GF180MCU PDK (GlobalFoundries 180nm) – A fully open PDK offering analog, mixed-signal, and MCU-friendly features.* https://gf180mcu-pdk.readthedocs.io
+>- *IHP Open Source PDK (SG13G2 – 130nm SiGe BiCMOS) – Open components for analog and RF SiGe processes.* https://github.com/IHP-GmbH/IHP-Open-PDK
+> 
 
+## Section 1: Initializing OpenLane and preparing design
+
+To invoke OpenLane, navigate to ```openlane/``` directory and initialize *docker* from the current working directory.<br>
+```
+# Change directory to openlane flow directory
+cd Desktop/work/tools/openlane_working_dir/openlane/
+```
+
+![Image](https://github.com/user-attachments/assets/aaf54ae1-8a30-4309-aff7-5d1c588b6301)
+
+
+```
+# Initialize docker in openlane directory
+docker
+```
+The OpenLane flow can be invoked in Interactive mode by executing the following command:<br>
+
+```./flow.tcl -interactive``` <br>
+
+This command initializes the OpenLANE flow in Interactive mode, enabling command execution and interaction with the SoC design.
+
+Now that the Openlane flow is running interactively, we input the require package for its function: <br>
+
+```
+# Package
+package require openlane 0.9
+```
+
+Next, prepare the design for the flow. In this exercise, *picorv32a* is selected and can be prepared as following:
+
+```
+# Prepare picorv32a design for the flow 
+prep -design picorv32a
+```
+
+> *Note that the provided OpenLane IP has 42 different designs which can be explored in  ```.../openlane_working_dir/openlane/designs``` directory.*<br>
+
+![Image](https://github.com/user-attachments/assets/d130a938-2fc5-48a3-851f-7b257cddd49a)
+
+
+At the *prep* stage, OpenLane performs several tasks to prepare the design for the subsequent stages of the flow. for example, it merges the LEF (Library Exchange Format) files (i.e., technology LEF `.tlef` and cell LEF `.lef`) into a single file, which contain the physical library data and is then used in the design flow.<br>
+Further, a new directory will be created in `.../openlane/designs/picorv32a/runs`with date-time of the prepration as name of the directory. This directory contains sub-directories for reports generated at each step along the flow.<br>
+The merged file `merged_unpadded.lef` can be accessed `../results/synthesis/` and read by:
+
+```
+# Open mergerd LEF file
+less merged_unpadded.lef
+``` 
+
+Now the design is ready for synthesis. Initilized it by executing the following command: <br>
+
+
+```
+# Run Synthesis of design
+run_synthesis
+```
+
+During synthesis, OpenLane uses *Yosys* and *ABC* to convert the RTL Verilog design into a *gate-level netlist* mapped to Sky130 standard cells. The flow optimizes logic, removes redundancies, performs timing checks with OpenSTA, and generates reports that guide the next stages of the flow. These reports can be accessed in `../reports/synthesis` directory. <br>
+For example, parameters like *Flop Ratio* and *DFF%* can be calcuated from statistics report `1-yosys_dff.stat` as shown in the following screenshot.
+
+![Image](https://github.com/user-attachments/assets/f119a59a-68d7-422f-acb5-fb7393413970)
+
+
+
+>In an ASIC synthesis, *Flop Ratio* and *DFF%* help to estimate how sequential-heavy a design is. They are derived from the synthesis statistics report, which lists the total number of standard cells and the number of flip-flops (DFFs) used in the netlist.
+
+#### Flop Ratio
+Flop Ratio indicates how many flip-flops exist relative to the total number of cells.
+
+$$
+\text{Flop Ratio} = \frac{\text{Number of DFF cells}}{\text{Total number of cells}}
+$$
+
+As per the above synthesis report, the *Flop Ratio* is calculated to be **0.089** in *picorv32a* design. 
+
+#### DFF%
+This expresses the flip-flop count as a percentage of the total cell count.
+$$
+\text{DFF\%} = \frac{\text{Number of DFF cells}}{\text{Total number of cells}} \times 100
+$$
+As per the above synthesis report, the *DFF%* is calculated to be **8.9%** in *picorv32a* design.
