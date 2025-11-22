@@ -144,7 +144,7 @@ For example, parameters like **Flop Ratio** and **DFF%** can be calcuated from s
 
 
 
->In an ASIC synthesis, *Flop Ratio* and <b>DFF%</b> help to estimate how sequential-heavy a design is. They are derived from the synthesis statistics report, which lists the total number of standard cells and the number of flip-flops (DFFs) used in the netlist.
+>In an ASIC synthesis, <b>*Flop Ratio*<b> and <b>*DFF%*</b> help to estimate how sequential-heavy a design is. They are derived from the synthesis statistics report, which lists the total number of standard cells and the number of flip-flops (DFFs) used in the netlist.
 
 #### Flop Ratio
 Flop Ratio indicates how many flip-flops exist relative to the total number of cells.
@@ -152,8 +152,12 @@ Flop Ratio indicates how many flip-flops exist relative to the total number of c
 $$
 \text{Flop Ratio} = \frac{\text{Number of DFF cells}}{\text{Total number of cells}}
 $$
+<br>
+$$
+\text{Flop Ratio} = \frac{1613}{18036} = 0.089
+$$
 
-As per the above synthesis report, the *Flop Ratio* is calculated to be **0.089** in *picorv32a* design. 
+As per the above synthesis report, the **Flop Ratio** is calculated to be **0.089** in *picorv32a* design. 
 
 #### DFF%
 This expresses the flip-flop count as a percentage of the total cell count.
