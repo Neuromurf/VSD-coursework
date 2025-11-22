@@ -144,29 +144,95 @@ For example, parameters like **Flop Ratio** and **DFF%** can be calcuated from s
 
 
 
->In an ASIC synthesis, <b>*Flop Ratio*<b> and <b>*DFF%*</b> help to estimate how sequential-heavy a design is. They are derived from the synthesis statistics report, which lists the total number of standard cells and the number of flip-flops (DFFs) used in the netlist.
+>*In an ASIC synthesis, *Flop Ratio* and *DFF%* help to estimate how sequential-heavy a design is. They are derived from the synthesis statistics report, which lists the total number of standard cells and the number of flip-flops (DFFs) used in the netlist.*<br>
 
 #### Flop Ratio
+
 Flop Ratio indicates how many flip-flops exist relative to the total number of cells.
 
 $$
 \text{Flop Ratio} = \frac{\text{Number of DFF cells}}{\text{Total number of cells}}
 $$
-<br>
+
 $$
 \text{Flop Ratio} = \frac{1613}{18036} = 0.089
 $$
 
-As per the above synthesis report, the **Flop Ratio** is calculated to be **0.089** in *picorv32a* design. 
+As per the above synthesis report, the **Flop Ratio** is calculated to be **0.089** in the *picorv32a* design.
 
 #### DFF%
+
 This expresses the flip-flop count as a percentage of the total cell count.
-<br>
 
 $$
 \text{DFF\%} = \frac{\text{Number of DFF cells}}{\text{Total number of cells}} \times 100
 $$
 
-<br>
-As per the above synthesis report, the <b>DFF%</b> is calculated to be <b>8.9%</b> in the design.
-<br>
+$$
+\text{DFF\%} = \frac{1613}{18036} \times 100 = 8.9\%
+$$
+
+As per the above synthesis report, the **DFF%** is calculated to be **8.9%** in this design.
+
+## Section 2: Floorplan & Placement in OpenLane Flow
+### Initializing Floorplan
+The Floorplan can be initialized by execuiting following command in *docker*:
+```
+# Run floorplan
+% run_floorplan
+```
+
+Once the floorplan completes, the layout can be opened in *Magic* by executing following command from `.../results/floorplan/` directory:
+
+```
+magic -T /home/vsduser/Desktop/work/tools/openlane_working_dir/pdks/sky130A/libs.tech/magic/sky130A.tech lef read ../../tmp/merged.lef def read picorv32a.floorplan.def &
+```
+
+![Image](https://github.com/user-attachments/assets/d023a6d6-101b-4709-a5f4-b96c7602e7f1)
+
+
+Review the floorplan layout in *Magic*.
+
+![Image](https://github.com/user-attachments/assets/fa879954-2f0a-46ab-a493-15fa98dabb3d)
+
+>*Some basic *Magic* shortkeys to navigate around.* `v` *to center/recenter view, use left mouse click + right mouse click to draw a selection box,* `z` *to zoom in at cursor locationv,* `shift + z` *to zoom out.*
+
+`tkcon`commandline can be used to analyze the layout/geometry by using different commands, such as `% what` to get information of a geometry at cursor location and `% box` to get the coordinates and size of selection box, etc.
+
+![Image](https://github.com/user-attachments/assets/513921a4-53fb-4569-a123-1824cd0e213c)
+
+The die area can be found in `.../results/floorplan/picorv32a.floorplan.def` file.
+
+![Image](https://github.com/user-attachments/assets/aa349fa9-1f9c-4c65-ac20-055732bb168c)
+
+
+
+In the `floorplan.def` file, die area is given in the form of die coordinates in data units where *`1 micron is equal to 1000 units`*.
+
+>*Tip: Alternatively, to get the area and coordinates of a complete layout, select the whole layout in Magic by short key* `s` *and running* `% box` *in tkcon commandline.* 
+
+### Initilizing Placement
+During floorplanning, OpenLane prepares the physical layout environment for placement and routing. It comprises of the following key stages:
+
+1. Die area and core area definition
+2. IO pin placement
+3. Tapcell (ensures latch-up prevention and substrate/well ties) and Decap cell (ensures stable local power supply rails) insertion
+4. Power delivery network (PDN) generation 
+
+The Placement can be initialized by execuiting following command in *docker*:
+```
+# Run Placement
+% run_placement
+```
+
+Once placement finishes, its `.def` file can be loaded in *Magic* for further analyses for the director `.../results/floorplan/picorv32a.placement.def` file.
+
+```
+magic -T /home/vsduser/Desktop/work/tools/openlane_working_dir/pdks/sky130A/libs.tech/magic/sky130A.tech lef read ../../tmp/merged.lef def read picorv32a.placement.def &
+```
+
+![Image](https://github.com/user-attachments/assets/f029f446-5226-47c2-af89-dae3f952105f)
+
+![Image](https://github.com/user-attachments/assets/c2795218-61ad-468f-b76f-501746d779c1)
+
+
